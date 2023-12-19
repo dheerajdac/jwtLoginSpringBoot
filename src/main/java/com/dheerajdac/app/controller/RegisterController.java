@@ -12,7 +12,6 @@ import com.dheerajdac.app.repository.UserRepo;
 import com.dheerajdac.app.repository.UserRoleRepo;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
