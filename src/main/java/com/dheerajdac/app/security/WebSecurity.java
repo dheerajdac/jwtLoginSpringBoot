@@ -32,45 +32,45 @@ import com.nimbusds.jose.proc.SecurityContext;
 public class WebSecurity {
 
     @Value("${jwt.public.key}")
-	RSAPublicKey key;
+    RSAPublicKey key;
 
-	@Value("${jwt.private.key}")
-	RSAPrivateKey priv;
+    @Value("${jwt.private.key}")
+    RSAPrivateKey priv;
 
     @Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		// @formatter:off
-		http
-				.authorizeHttpRequests((authorize) -> authorize
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // @formatter:off
+        http
+                .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/token").authenticated()
                         .requestMatchers("/register").permitAll()
-						.anyRequest().permitAll()
-				)
-				.csrf((csrf) -> csrf.disable())
-				.httpBasic(Customizer.withDefaults())
-				.oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
-				.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.exceptionHandling((exceptions) -> exceptions
-						.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-						.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
-				);
-		// @formatter:on
-		return http.build();
-	}
+                        .anyRequest().permitAll()
+                )
+                .csrf((csrf) -> csrf.disable())
+                .httpBasic(Customizer.withDefaults())
+                .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling((exceptions) -> exceptions
+                        .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+                );
+        // @formatter:on
+        return http.build();
+    }
 
 
     @Bean
-	JwtDecoder jwtDecoder() {
-		return NimbusJwtDecoder.withPublicKey(this.key).build();
-	}
+    JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withPublicKey(this.key).build();
+    }
 
-	@Bean
-	JwtEncoder jwtEncoder() {
-		JWK jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
-		JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-		return new NimbusJwtEncoder(jwks);
-	}
+    @Bean
+    JwtEncoder jwtEncoder() {
+        JWK jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
+        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+        return new NimbusJwtEncoder(jwks);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() throws Exception {
