@@ -24,11 +24,19 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.dheerajdac.app.repository.UserRepo;
+
+import org.springframework.security.oauth2.jose.jws.JwsAlgorithm;
+import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
+import org.springframework.security.oauth2.jwt.*;;
+
 
 /**
  * A controller for the token resource.
@@ -41,6 +49,9 @@ public class TokenController {
 	@Autowired
 	JwtEncoder encoder;
 
+	@Autowired
+	UserRepo userRepo;
+
 	@GetMapping("/token")
 	public String token(Authentication authentication) {
 		Instant now = Instant.now();
@@ -49,22 +60,13 @@ public class TokenController {
 		String scope = authentication.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.joining(" "));
-
-		Consumer<Map<String, Object>> claimConsumer = map -> {
-			authentication.getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.forEach( s -> {
-					String[] arr = s.split(":");
-					map.put(arr[0], arr[1]);
-				});
-		};
+		
 		JwtClaimsSet claims = JwtClaimsSet.builder()
 				.issuer("self")
 				.issuedAt(now)
 				.expiresAt(now.plusSeconds(expiry))
-				.subject(authentication.getName())
+				.subject(userRepo.findByUsername(authentication.getName()).getId().toString())
 				.claim("scope", scope)
-				.claims(claimConsumer)
 				.build();
 		// @formatter:on
 		return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

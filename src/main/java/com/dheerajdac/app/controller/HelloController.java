@@ -7,9 +7,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.oauth2.jwt.Jwt;
 
+import com.dheerajdac.app.facade.UserFacade;
 import com.dheerajdac.app.repository.UserRepo;
 
 @RestController
@@ -17,6 +21,9 @@ public class HelloController {
 
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    UserFacade userFacade;
     
     @GetMapping("/api/")
     @PreAuthorize("hasAuthority('ADMIN:READ')")
@@ -27,7 +34,7 @@ public class HelloController {
     @GetMapping("/api/test")
     @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN:READ')")
     public String gets() {
-        return "hello test";
+        return "hello test: " + userFacade.getUserId();
     }
 
     @GetMapping("/all")
