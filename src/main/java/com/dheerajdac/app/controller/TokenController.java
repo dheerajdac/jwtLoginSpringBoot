@@ -17,6 +17,8 @@
 package com.dheerajdac.app.controller;
 
 import java.time.Instant;
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +49,22 @@ public class TokenController {
 		String scope = authentication.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.joining(" "));
+
+		Consumer<Map<String, Object>> claimConsumer = map -> {
+			authentication.getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
+				.forEach( s -> {
+					String[] arr = s.split(":");
+					map.put(arr[0], arr[1]);
+				});
+		};
 		JwtClaimsSet claims = JwtClaimsSet.builder()
 				.issuer("self")
 				.issuedAt(now)
 				.expiresAt(now.plusSeconds(expiry))
 				.subject(authentication.getName())
 				.claim("scope", scope)
+				.claims(claimConsumer)
 				.build();
 		// @formatter:on
 		return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

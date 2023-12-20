@@ -35,7 +35,7 @@ public class UserRole implements GrantedAuthority{
 
     @Override
     public String getAuthority() {
-        return Role.getRoleByValue(this.role) + "_" + Privilege.getPrivilegeByValue(this.privilege);
+        return Role.getRoleByValue(this.role).getName() + ":" + Privilege.getPrivilegeByValue(this.privilege).getName();
     }
 
     @Override

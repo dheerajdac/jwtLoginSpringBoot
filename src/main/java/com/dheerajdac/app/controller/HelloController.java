@@ -1,10 +1,15 @@
 package com.dheerajdac.app.controller;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dheerajdac.app.entity.User;
 import com.dheerajdac.app.repository.UserRepo;
 
 @RestController
@@ -13,13 +18,20 @@ public class HelloController {
     @Autowired
     UserRepo userRepo;
     
-    @GetMapping("/")
+    @GetMapping("/api/")
+    @PreAuthorize("hasAuthority('ADMIN:READ')")
     public String get() {
         return "hello world";
     }
 
+    @GetMapping("/api/test")
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN:READ')")
+    public String gets() {
+        return "hello test";
+    }
+
     @GetMapping("/all")
-    public Iterable<User> getAll() {
-        return userRepo.findAll();
+    public Collection<? extends GrantedAuthority> getAll() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities();
     }
 }

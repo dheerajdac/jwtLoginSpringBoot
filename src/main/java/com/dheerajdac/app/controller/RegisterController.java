@@ -39,7 +39,7 @@ public class RegisterController {
         user.setEmail(request.getEmail());
         user.setPassword(this.passwordEncoder.encode(request.getPassword()));
         UserRole role = new UserRole();
-        role.setRole(Role.ROLE_ADMIN.getValue());
+        role.setRole(Role.ADMIN.getValue());
         role.setPrivilege(Privilege.READ.getValue());
         role.setUser(user);
         user.setRoles(List.of(role));

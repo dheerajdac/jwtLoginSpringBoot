@@ -2,9 +2,9 @@ package com.dheerajdac.app.enums;
 
 public enum Role {
     
-    ROLE_ADMIN("ROLE_ADMIN", 1),
-    ROLE_SUPPORT("ROLE_SUPPORT", 2),
-    ROLE_USER("ROLE_USER", 3);
+    ADMIN("ADMIN", 1),
+    SUPPORT("SUPPORT", 2),
+    USER("USER", 3);
 
     private Role(String name, Integer value) {
         this.name = name;
